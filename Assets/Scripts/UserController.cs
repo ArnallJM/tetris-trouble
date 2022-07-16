@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityEngine.SceneManagement;
+using CustomClasses;
 
 namespace UnityStandardAssets._2D
 {
@@ -10,7 +11,8 @@ namespace UnityStandardAssets._2D
     {
         private CharacterBehaviour m_Character;
         private bool m_Jump;
-        private CharacterBehaviour.AttackState m_Attack;
+        private bool m_Attack;
+        private bool m_Hold;
 
 
         private void Awake()
@@ -21,6 +23,11 @@ namespace UnityStandardAssets._2D
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Debug.Log("Quitting...");
+                Application.Quit();
+            }
             if (Input.GetKeyDown(KeyCode.R))
             {
                 SceneManager.LoadScene ("test scene");
@@ -30,15 +37,15 @@ namespace UnityStandardAssets._2D
                 // Read the jump input in Update so button presses aren't missed.
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
-            if (m_Attack == CharacterBehaviour.AttackState.Idle)
+            if (!m_Attack)
             {
                 if (Input.GetKeyDown(KeyCode.J))
                 {
-                    m_Attack = CharacterBehaviour.AttackState.Slash;
+                    m_Attack = true;
                 }
                 else if (Input.GetKeyDown(KeyCode.K))
                 {
-                    m_Attack = CharacterBehaviour.AttackState.Dash;
+                    m_Hold = true;
                 }
             }
         }
@@ -50,10 +57,12 @@ namespace UnityStandardAssets._2D
 //             bool crouch = Input.GetKey(KeyCode.LeftControl);
             float h = CrossPlatformInputManager.GetAxis("Horizontal");
             // Pass all parameters to the character control script.
-            m_Character.Attack(m_Attack);
+            m_Character.UsePreparedAttack(m_Attack);
+            m_Character.HoldPreparedAttack(m_Hold);
             m_Character.Move(h, m_Jump);
-            m_Attack = CharacterBehaviour.AttackState.Idle;
+            m_Attack = false;
             m_Jump = false;
+            m_Hold = false;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using CustomClasses;
 
 #pragma warning disable 649
 namespace UnityStandardAssets._2D
@@ -24,11 +25,19 @@ namespace UnityStandardAssets._2D
 //         private Animator m_Anim;            // Reference to the player's animator component.
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
-        public enum AttackState { Idle, Cooldown, Slash, Dash }
+//         public enum AttackState { Idle, Cooldown, Slash, Dash }
         private AttackState m_CurrentAttackState = AttackState.Idle;
         private float m_AttackToggleTime;      // Time at which attacks become possible again
         private GameObject m_SlashObject;   // Gameobject of slash attack
         private GameObject m_DashObject;   // Box collider of player
+        private System.Random m_RandomGenerator = new System.Random();
+        
+        const int k_FunctionalAttacks = 2;
+        
+        private AttackState m_HeldAttack = AttackState.Idle;
+        private AttackState m_NextAttack = AttackState.Idle;
+        private AttackState m_PreparedAttack = AttackState.Idle;
+        private IconContainerBehaviour m_IconContainerBehaviour;
 
         private void Awake()
         {
@@ -39,6 +48,14 @@ namespace UnityStandardAssets._2D
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
             m_SlashObject = (transform.Find("Attacks/Slash")).gameObject;
             m_DashObject = (transform.Find("Attacks/Dash")).gameObject;
+            m_IconContainerBehaviour = GameObject.Find("/Main Camera/IconContainer").GetComponent<IconContainerBehaviour>();
+        }
+        
+        private void Start()
+        {
+            m_PreparedAttack = RollAttack();
+            m_NextAttack = RollAttack();
+            RefreshIcons();
         }
 
 
@@ -65,7 +82,9 @@ namespace UnityStandardAssets._2D
         {
             // If crouching, check to see if the character can stand up
 //             if (!crouch && m_Anim.GetBool("Crouch"))
-//             {
+//             {reparedDash;
+//     private GameObject m_PreparedBoost;
+//     private GameObject m_PreparedShoot;
                 // If the character has a ceiling preventing them from standing up, keep them crouching
 //                 if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
 //                 {
@@ -122,6 +141,63 @@ namespace UnityStandardAssets._2D
             }
         }
         
+        public void RefreshIcons()
+        {
+//             Debug.Log(m_HeldAttack);
+//             Debug.Log(m_NextAttack);
+//             Debug.Log(m_PreparedAttack);
+            m_IconContainerBehaviour.SetHeldAttack(m_HeldAttack);
+            m_IconContainerBehaviour.SetNextAttack(m_NextAttack);
+            m_IconContainerBehaviour.SetPreparedAttack(m_PreparedAttack);
+        }
+        
+        public AttackState RollAttack()
+        {
+            int number = m_RandomGenerator.Next(2, 2+k_FunctionalAttacks);
+            return (AttackState)number;
+        }
+        
+        public AttackState PopPreparedAttack()
+        {
+            AttackState attack = m_PreparedAttack;
+            m_PreparedAttack = m_NextAttack;
+            m_NextAttack = RollAttack();
+            m_IconContainerBehaviour.SetPreparedAttack(m_PreparedAttack);
+            m_IconContainerBehaviour.SetNextAttack(m_NextAttack);
+            return attack;
+        }
+        
+        public void HoldPreparedAttack(bool hold)
+        {
+            if (hold)
+            {
+                AttackState tempAttack = m_PreparedAttack;
+                if (m_HeldAttack == AttackState.Idle)
+                {
+                    m_PreparedAttack = m_NextAttack;
+                    m_NextAttack = RollAttack();
+                }
+                else
+                {
+                    m_PreparedAttack = m_HeldAttack;
+                }
+                m_HeldAttack = tempAttack;
+                RefreshIcons();
+            }
+        }
+        
+        public void UsePreparedAttack(bool attack)
+        {
+            if (attack && m_CurrentAttackState == AttackState.Idle)
+            {
+                AttackState tempAttack = PopPreparedAttack();
+                Attack(tempAttack);
+            }
+            else
+            {
+                Attack(AttackState.Idle);
+            }
+        }
         
         public void Attack(AttackState attack)
         {   
