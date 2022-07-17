@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - PlayerAttack
+  - Solid
   layers:
   - Default
   - TransparentFX
@@ -13,8 +14,8 @@ TagManager:
   - Solids
   - Water
   - UI
-  - 
-  - 
+  - NonPlayerCollisions
+  - Player
   - 
   - 
   - 
