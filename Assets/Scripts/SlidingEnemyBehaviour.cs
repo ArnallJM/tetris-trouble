@@ -7,6 +7,7 @@ public class SlidingEnemyBehaviour : MonoBehaviour
     [SerializeField] private float m_Speed = 5f;
     [SerializeField] private bool m_FacingRight = true;
     
+    const float k_VelocityZero = 0.0001f;
     private float m_LeftBoundary;
     private float m_RightBoundary;
     private Rigidbody2D m_Rigidbody2D;
@@ -27,14 +28,14 @@ public class SlidingEnemyBehaviour : MonoBehaviour
     {
         if (m_FacingRight)
         {
-            if (gameObject.transform.position.x >= m_RightBoundary || m_Rigidbody2D.velocity.x == 0)
+            if (gameObject.transform.position.x >= m_RightBoundary || m_Rigidbody2D.velocity.magnitude < k_VelocityZero)
             {
                 m_FacingRight = false;
             }
         }
         else
         {
-            if (gameObject.transform.position.x <= m_LeftBoundary || m_Rigidbody2D.velocity.x == 0)
+            if (gameObject.transform.position.x <= m_LeftBoundary || m_Rigidbody2D.velocity.magnitude < k_VelocityZero)
             {
                 m_FacingRight = true;
             }

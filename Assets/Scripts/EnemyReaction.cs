@@ -18,7 +18,7 @@ public class EnemyReaction : MonoBehaviour {
 //     Debug.Log(other.collider.tag);
     if (other.collider.CompareTag ("Enemy")) {
       // This scene HAS TO BE IN THE BUILD SETTINGS!!!
-      SceneManager.LoadScene ("test scene");
+      GameBehaviour.Instance.OnPlayerDeath();
     }
   }
 }

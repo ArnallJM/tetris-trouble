@@ -10,7 +10,16 @@ public class EnemyBehaviour : MonoBehaviour
     {
         if (!m_Invincible && other.CompareTag ("PlayerAttack"))
         {
+            GameBehaviour.Instance.OnEnemyDeath();
             Object.Destroy(gameObject);
         }
     }
+
+    // void OnTriggerStay2D (Collider2D other) 
+    // {
+    //     if (!m_Invincible && other.CompareTag ("PlayerAttack"))
+    //     {
+    //         Object.Destroy(gameObject);
+    //     }
+    // }
 }

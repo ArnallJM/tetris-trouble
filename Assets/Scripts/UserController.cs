@@ -23,19 +23,19 @@ namespace UnityStandardAssets._2D
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Debug.Log("Quitting...");
-                Application.Quit();
-            }
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                SceneManager.LoadScene ("test scene");
-            }
+            // if (Input.GetKeyDown(KeyCode.Escape))
+            // {
+            //     // Debug.Log("Quitting...");
+            //     SceneManager.LoadScene(0);
+            // }
+            // if (Input.GetKeyDown(KeyCode.R))
+            // {
+            //     SceneManager.LoadScene (SceneManager.GetActiveScene().name);
+            // }
             if (!m_Jump)
             {
                 // Read the jump input in Update so button presses aren't missed.
-                m_Jump = (CrossPlatformInputManager.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W));
+                m_Jump = (CrossPlatformInputManager.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow));
             }
             if (!m_Attack)
             {

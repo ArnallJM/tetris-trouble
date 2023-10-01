@@ -32,6 +32,8 @@ namespace UnityStandardAssets._2D
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = 1f; // Radius of the overlap circle to determine if grounded
         private bool m_Grounded;            // Whether or not the player is grounded.
+        const float k_JumpDelay = 0.01f;
+        private float m_JumpAllowed = 0f;
 //         private Transform m_CeilingCheck;   // A position marking where to check for ceilings
 //         const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
 //         private Animator m_Anim;            // Reference to the player's animator component.
@@ -48,6 +50,7 @@ namespace UnityStandardAssets._2D
         private GameObject m_BoostObject;
         private Vector3 m_BulletSpawnPosition = new Vector3(1.0f, 0f, 0f);
         private GameObject m_BeamObject;
+        private DetectorBehaviour m_GroundDetector;
         
         private AttackState m_HeldAttack = AttackState.Idle;
         private AttackState m_NextAttack = AttackState.Idle;
@@ -67,6 +70,7 @@ namespace UnityStandardAssets._2D
             m_DashObject = (transform.Find("Attacks/Dash")).gameObject;
             m_BoostObject = transform.Find("Attacks/Boost").gameObject;
             m_BeamObject = transform.Find("Attacks/Beam").gameObject;
+            m_GroundDetector = transform.Find("GroundDetector").gameObject.GetComponent<DetectorBehaviour>();
         }
         
         private void Start()
@@ -79,16 +83,11 @@ namespace UnityStandardAssets._2D
 
         private void FixedUpdate()
         {
-            m_Grounded = false;
+            m_Grounded = m_GroundDetector.Probe();
 
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
             // This can be done using layers instead but Sample Assets will not overwrite your project settings.
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                if (colliders[i].gameObject != gameObject)
-                    m_Grounded = true;
-            }
+            
 //             m_Anim.SetBool("Ground", m_Grounded);
 
             // Set the vertical animation
@@ -150,12 +149,13 @@ namespace UnityStandardAssets._2D
                 }
             }
             // If the player should jump...
-            if (m_Grounded && jump)
+            if (m_Grounded && jump && Time.time >= m_JumpAllowed)
             {
                 // Add a vertical force to the player.
                 m_Grounded = false;
 //                 m_Anim.SetBool("Ground", false);
                 m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+                m_JumpAllowed = Time.time + k_JumpDelay;
             }
         }
         

@@ -16,10 +16,10 @@ TagManager:
   - UI
   - NonPlayerCollisions
   - Player
-  - 
-  - 
-  - 
-  - 
+  - Enemies
+  - SolidDetectors
+  - GhostEnemies
+  - PlayerAttacks
   - 
   - 
   - 
